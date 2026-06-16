@@ -92,7 +92,7 @@
   }
 
   window.SiteConfig = {
-    VERSION: "home-1.15.0",
+    VERSION: "home-1.16.0",
     LAST_ROOM_KEY,
     FIREBASE_CONFIG,
     ADMIN_UIDS,

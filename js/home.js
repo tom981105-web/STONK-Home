@@ -204,7 +204,12 @@
   }
 
   function setAdminVisible(visible) {
-    document.querySelectorAll(".admin-only").forEach((el) => { el.hidden = !visible; });
+    document.querySelectorAll(".admin-only").forEach((el) => {
+      const show = !!visible;
+      el.hidden = !show;
+      el.classList.toggle("admin-visible", show);
+      el.setAttribute("aria-hidden", show ? "false" : "true");
+    });
   }
 
   function setAuthUi(user, isAdmin) {
