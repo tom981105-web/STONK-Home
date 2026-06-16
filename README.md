@@ -38,7 +38,9 @@ SiteConfig.VERSION
 - btnScrollJoin 제거에 맞춰 JS 이벤트 바인딩 안전 처리
 
 
-## v1.16.0
-- 일반 이용자에게 각 사이트 역할 영역의 Admin 카드가 보이는 문제 수정
-- hidden 속성이 CSS display 규칙에 덮이지 않도록 `[hidden] { display:none !important; }` 추가
-- 관리자 요소는 관리자 권한 확인 후에만 `admin-visible` 클래스로 표시
+## v1.17.0
+- STONK Arcade 사이트 추가
+- 상단 메뉴, 방 입장 카드, 사이트 카드에 Arcade 연결 추가
+- Arcade 배포 주소: https://tom981105-web.github.io/STONK-Arcade/
+- 방 코드 입력 시 Arcade에도 `?room=방코드`를 붙여 이동
+- 연동 사이트 수 4개에서 5개로 변경

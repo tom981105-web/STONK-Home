@@ -648,7 +648,8 @@
   const btnScrollJoin = $("btnScrollJoin");
   if (btnScrollJoin) btnScrollJoin.addEventListener("click", () => $("joinCard").scrollIntoView({ behavior: "smooth", block: "center" }));
   $("btnJoinBattle").addEventListener("click", () => go("battle", true, false));
-  $("btnJoinArcade").addEventListener("click", () => go("arcade", true, false));
+  const btnJoinArcade = $("btnJoinArcade");
+  if (btnJoinArcade) btnJoinArcade.addEventListener("click", () => go("arcade", true, false));
   $("btnJoinBoard").addEventListener("click", () => go("board", true, false));
   $("btnJoinWiki").addEventListener("click", () => go("wiki", true, false));
   $("btnJoinAdmin").addEventListener("click", () => go("admin", true, true));

@@ -7,7 +7,7 @@
   <title>STONK Home | 가상 주식 투자 대전</title>
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
-  <link rel="stylesheet" href="css/home.css?v=1.14.0" />
+  <link rel="stylesheet" href="css/home.css?v=1.17.0" />
 </head>
 <body>
   <div class="bg-glow bg-glow-a"></div>
@@ -20,6 +20,7 @@
     </a>
     <nav class="top-nav" aria-label="STONK sites">
       <a id="topBattle" href="#">Battle</a>
+      <a id="topArcade" href="#">Arcade</a>
       <a id="topBoard" href="#">Board</a>
       <a id="topWiki" href="#">Wiki</a>
       <button id="btnAuthOpen" class="nav-auth-btn" type="button">로그인</button>
@@ -79,7 +80,7 @@
           <button id="btnGoBattle" class="btn primary big" type="button">주식시장 시작</button>
                   </div>
         <div class="hero-stats" aria-label="STONK 구성 사이트">
-          <div><b>4</b><span>연동 사이트</span></div>
+          <div><b>5</b><span>연동 사이트</span></div>
           <div><b>LIVE</b><span>시세/뉴스</span></div>
           <div><b>LOGIN</b><span>계정 연동</span></div>
         </div>
@@ -129,6 +130,9 @@
           <button id="btnJoinBattle" class="quick-card battle" type="button">
             <span>Battle</span><b>주식시장 입장</b><small>매수 · 매도 · 순위 경쟁</small>
           </button>
+          <button id="btnJoinArcade" class="quick-card arcade" type="button">
+            <span>Arcade</span><b>아케이드 입장</b><small>복권 · 블랙잭 · 사다리 미니게임</small>
+          </button>
           <button id="btnJoinBoard" class="quick-card board" type="button">
             <span>Board</span><b>시장 소식 보기</b><small>속보 · 공시 · 업종 분위기</small>
           </button>
@@ -176,6 +180,12 @@
           <a id="siteBattle" class="text-link" href="#">Battle 열기</a>
         </article>
         <article class="site-card card">
+          <span class="site-icon">🎰</span>
+          <h3>STONK Arcade</h3>
+          <p>Battle 자금 흐름과 연결되는 미니게임 허브입니다. 복권, 블랙잭 Lite, 사다리 같은 짧은 승부를 즐깁니다.</p>
+          <a id="siteArcade" class="text-link" href="#">Arcade 열기</a>
+        </article>
+        <article class="site-card card">
           <span class="site-icon">📰</span>
           <h3>STONK Board</h3>
           <p>방에 연결된 뉴스, 공시, 루머, 업종 분위기를 확인하는 시장 정보 터미널입니다.</p>
@@ -204,7 +214,7 @@
       <div class="flow-grid">
         <div class="flow-item"><b>1</b><span>관리자가 Home 또는 Admin에서 방을 만들고 방 코드를 공유합니다.</span></div>
         <div class="flow-item"><b>2</b><span>참여자는 Home에서 로그인 후 방 코드를 입력합니다.</span></div>
-        <div class="flow-item"><b>3</b><span>Board와 Wiki를 보면서 어떤 종목을 살지 판단합니다.</span></div>
+        <div class="flow-item"><b>3</b><span>Board와 Wiki를 보면서 종목을 판단하고, Arcade에서 짧은 미니게임도 즐길 수 있습니다.</span></div>
         <div class="flow-item"><b>4</b><span>제한 시간 후 총자산 1위를 노립니다.</span></div>
       </div>
     </section>
@@ -218,7 +228,7 @@
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
-  <script src="js/site-config.js?v=1.14.0"></script>
-  <script src="js/home.js?v=1.14.0"></script>
+  <script src="js/site-config.js?v=1.17.0"></script>
+  <script src="js/home.js?v=1.17.0"></script>
 </body>
 </html>

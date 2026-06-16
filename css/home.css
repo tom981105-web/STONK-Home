@@ -21,7 +21,6 @@
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
-[hidden] { display: none !important; }
 html { scroll-behavior: smooth; }
 body {
   min-height: 100vh;
@@ -337,5 +336,5 @@ input:focus { border-color: var(--brand); background: #fff; }
 }
 
 
-/* v1.16.0 - 일반 이용자에게 Admin 요소가 보이지 않도록 강제 숨김 */
+/* v1.17.0 - 일반 이용자에게 Admin 요소가 보이지 않도록 강제 숨김 */
 .admin-only:not(.admin-visible) { display: none !important; }
