@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="STONK — 친구들과 즐기는 가상 주식 투자 대전 메인 허브" />
+  <title>STONK Home | 가상 주식 투자 대전</title>
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+  <link rel="stylesheet" href="css/home.css?v=1.15.0" />
+</head>
+<body>
+  <div class="bg-glow bg-glow-a"></div>
+  <div class="bg-glow bg-glow-b"></div>
+
+  <header class="home-header">
+    <a class="brand" href="./index.html" aria-label="STONK Home">
+      <span class="brand-mark">S</span>
+      <span class="brand-text">STONK <b>Home</b></span>
+    </a>
+    <nav class="top-nav" aria-label="STONK sites">
+      <a id="topBattle" href="#">Battle</a>
+      <a id="topArcade" href="#">Arcade</a>
+      <a id="topBoard" href="#">Board</a>
+      <a id="topWiki" href="#">Wiki</a>
+      <button id="btnAuthOpen" class="nav-auth-btn" type="button">로그인</button>
+      <a id="topAdmin" href="#" class="admin-link admin-only" hidden>Admin</a>
+    </nav>
+  </header>
+
+  <div id="authModal" class="auth-modal" hidden>
+    <div id="authDim" class="auth-dim"></div>
+    <section class="auth-pop card" role="dialog" aria-modal="true" aria-labelledby="authTitle">
+      <div class="auth-pop-head">
+        <div>
+          <span id="authBadgeModal" class="mini-badge muted">확인 중</span>
+          <h2 id="authTitle">STONK 로그인</h2>
+          <p>Battle에서 쓰는 계정과 같은 Firebase 계정입니다.</p>
+        </div>
+        <button id="btnAuthClose" class="icon-btn" type="button" aria-label="로그인 창 닫기">×</button>
+      </div>
+
+      <div id="signedOutBox" class="auth-box pop-auth-box">
+        <label class="input-label" for="emailInput">이메일</label>
+        <input id="emailInput" class="auth-input" type="email" placeholder="이메일" autocomplete="email" spellcheck="false" />
+        <label class="input-label" for="passwordInput">비밀번호</label>
+        <input id="passwordInput" class="auth-input" type="password" placeholder="비밀번호 6자 이상" autocomplete="current-password" />
+        <label class="remember-row" for="rememberLogin">
+          <input id="rememberLogin" type="checkbox" checked />
+          <span>자동 로그인 유지</span>
+        </label>
+        <div class="auth-actions">
+          <button id="btnLogin" class="btn primary" type="button">로그인</button>
+          <button id="btnSignup" class="btn ghost" type="button">회원가입</button>
+        </div>
+        <p id="authMsg" class="msg">로그인하면 방 입장과 권한 확인이 가능합니다.</p>
+      </div>
+
+      <div id="signedInBox" class="auth-user pop-auth-user" hidden>
+        <div>
+          <span>로그인 계정</span>
+          <b id="userEmail">-</b>
+          <small id="userRole">권한 확인 중</small>
+        </div>
+        <button id="btnLogout" class="btn tiny" type="button">로그아웃</button>
+      </div>
+    </section>
+  </div>
+
+  <main>
+    <section class="hero-wrap">
+      <div class="hero-copy">
+        <span class="eyebrow"><span class="live-dot"></span> 가상 데이터 · 멀티플레이 · 실시간 시장</span>
+        <h1>STONK 전체를<br /><span>한 화면에서 관리</span></h1>
+        <p class="hero-desc">
+          Home에서 방 코드 입력, 로그인, 관리자 방 생성, 사이트 이동까지 한 화면에서 처리합니다.
+          데스크톱에서는 허브처럼 넓게 보고, 모바일에서는 필요한 순서대로 간단히 사용할 수 있습니다.
+        </p>
+        <div class="hero-actions">
+          <button id="btnGoBattle" class="btn primary big" type="button">주식시장 시작</button>
+                  </div>
+        <div class="hero-stats" aria-label="STONK 구성 사이트">
+          <div><b>5</b><span>연동 사이트</span></div>
+          <div><b>LIVE</b><span>시세/뉴스</span></div>
+          <div><b>LOGIN</b><span>계정 연동</span></div>
+        </div>
+      </div>
+
+      <aside class="card command-card" id="joinCard">
+        <div class="card-head">
+          <div>
+            <h2>방 입장 컨트롤</h2>
+            <p>방 코드 입력, 로그인 상태, 관리자 방 생성을 한 카드에서 처리합니다.</p>
+          </div>
+          <span id="authBadgeJoin" class="mini-badge muted">확인 중</span>
+        </div>
+
+        <div class="login-hint">
+          <b>로그인 상태</b>
+          <span id="joinAuthText">확인 중입니다.</span>
+          <button id="btnOpenAuthFromCard" class="btn tiny" type="button">로그인</button>
+        </div>
+
+
+
+        <div id="adminCreateBox" class="admin-create-box admin-only" hidden>
+          <div class="admin-create-head">
+            <div>
+              <b>관리자 방 생성</b>
+              <span>Home에서 실제 Firebase 방을 생성합니다.</span>
+            </div>
+            <span class="mini-badge">ADMIN</span>
+          </div>
+          <label class="input-label" for="roomTitleInput">방 이름 선택</label>
+          <input id="roomTitleInput" class="normal-input" maxlength="24" placeholder="예: 점심시간 주식대전" autocomplete="off" spellcheck="false" />
+          <div class="admin-create-actions">
+            <button id="btnCreateRoom" class="btn primary" type="button">새 방 생성</button>
+            <button id="btnOpenCreatedAdmin" class="btn ghost" type="button" disabled>Admin에서 관리</button>
+          </div>
+          <p id="createRoomMsg" class="msg">생성된 방은 Battle · Board · Wiki에서 같은 방 코드로 연결됩니다.</p>
+        </div>
+
+        <label class="input-label" for="roomCodeInput">방 코드</label>
+        <div class="room-row single">
+          <input id="roomCodeInput" maxlength="12" placeholder="예: ABC123" autocomplete="off" spellcheck="false" />
+        </div>
+        <p id="roomMsg" class="msg">관리자에게 받은 방 코드를 입력하세요. 최근 방 코드가 있으면 자동으로 불러옵니다.</p>
+
+        <div class="quick-grid">
+          <button id="btnJoinBattle" class="quick-card battle" type="button">
+            <span>Battle</span><b>주식시장 입장</b><small>매수 · 매도 · 순위 경쟁</small>
+          </button>
+          <button id="btnJoinArcade" class="quick-card arcade" type="button">
+            <span>Arcade</span><b>아케이드 입장</b><small>복권 · 블랙잭 · 사다리 미니게임</small>
+          </button>
+          <button id="btnJoinBoard" class="quick-card board" type="button">
+            <span>Board</span><b>시장 소식 보기</b><small>속보 · 공시 · 업종 분위기</small>
+          </button>
+          <button id="btnJoinWiki" class="quick-card wiki" type="button">
+            <span>Wiki</span><b>회사 분석 보기</b><small>종목 정보 · 강점 · 약점</small>
+          </button>
+          <button id="btnJoinAdmin" class="quick-card admin admin-only" type="button" hidden>
+            <span>Admin</span><b>관리자 페이지</b><small>방 생성 · 관리 · 보정</small>
+          </button>
+        </div>
+
+        <div id="recentBox" class="recent-box" hidden>
+          <span>최근 방</span>
+          <b id="recentRoom">-</b>
+          <button id="btnUseRecent" class="btn tiny" type="button">불러오기</button>
+        </div>
+      </aside>
+    </section>
+
+    <section class="ticker-card card market-pulse-card" aria-label="STONK Market Pulse">
+      <div class="ticker-head">
+        <strong>STONK Market Pulse</strong>
+        <span id="pulseStatus">방 데이터 연결 대기</span>
+        <button id="btnRefreshPulse" class="btn tiny pulse-refresh" type="button">새로고침</button>
+      </div>
+      <div class="ticker-track">
+        <div class="ticker-line static-line" id="tickerLine">
+          <span>방 코드를 입력하면 Battle 방의 실제 종목 등락률과 뉴스가 표시됩니다.</span>
+          <span>Battle에서 가격이 움직이면 이 영역도 자동으로 갱신됩니다.</span>
+          <span>Home · Battle · Board · Wiki가 같은 room 코드를 기준으로 연결됩니다.</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="site-section">
+      <div class="section-title">
+        <p>STONK SITES</p>
+        <h2>각 사이트 역할</h2>
+      </div>
+      <div class="site-grid">
+        <article class="site-card card">
+          <span class="site-icon">📈</span>
+          <h3>STONK Battle</h3>
+          <p>실제 게임이 진행되는 주식시장입니다. 매수·매도, 공모주, 순위, 포트폴리오를 관리합니다.</p>
+          <a id="siteBattle" class="text-link" href="#">Battle 열기</a>
+        </article>
+        <article class="site-card card">
+          <span class="site-icon">🎰</span>
+          <h3>STONK Arcade</h3>
+          <p>Battle 자금 흐름과 연결되는 미니게임 허브입니다. 복권, 블랙잭 Lite, 사다리 같은 짧은 승부를 즐깁니다.</p>
+          <a id="siteArcade" class="text-link" href="#">Arcade 열기</a>
+        </article>
+        <article class="site-card card">
+          <span class="site-icon">📰</span>
+          <h3>STONK Board</h3>
+          <p>방에 연결된 뉴스, 공시, 루머, 업종 분위기를 확인하는 시장 정보 터미널입니다.</p>
+          <a id="siteBoard" class="text-link" href="#">Board 열기</a>
+        </article>
+        <article class="site-card card">
+          <span class="site-icon">🔎</span>
+          <h3>STONK Wiki</h3>
+          <p>방마다 달라지는 회사 정보와 투자 요약을 확인하는 종목 분석 사이트입니다.</p>
+          <a id="siteWiki" class="text-link" href="#">Wiki 열기</a>
+        </article>
+        <article id="siteAdminCard" class="site-card card locked admin-only" hidden>
+          <span class="site-icon">🛠️</span>
+          <h3>STONK Admin</h3>
+          <p>운영자용 방 관리 페이지입니다. 방 생성, 삭제, 시장 보정, 상태 확인 같은 관리 기능을 담당합니다.</p>
+          <a id="siteAdmin" class="text-link" href="#">Admin 열기</a>
+        </article>
+      </div>
+    </section>
+
+    <section class="flow-section card">
+      <div class="section-title left">
+        <p>HOW TO PLAY</p>
+        <h2>처음 접속한 친구도 바로 이해하게</h2>
+      </div>
+      <div class="flow-grid">
+        <div class="flow-item"><b>1</b><span>관리자가 Home 또는 Admin에서 방을 만들고 방 코드를 공유합니다.</span></div>
+        <div class="flow-item"><b>2</b><span>참여자는 Home에서 로그인 후 방 코드를 입력합니다.</span></div>
+        <div class="flow-item"><b>3</b><span>Board와 Wiki를 보면서 종목을 판단하고, Arcade에서 짧은 미니게임도 즐길 수 있습니다.</span></div>
+        <div class="flow-item"><b>4</b><span>제한 시간 후 총자산 1위를 노립니다.</span></div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="home-footer">
+    <b>STONK Home</b>
+    <span>모든 데이터는 가상이며 실제 투자/기업/뉴스와 무관합니다.</span>
+  </footer>
+
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+  <script src="js/site-config.js?v=1.15.0"></script>
+  <script src="js/home.js?v=1.15.0"></script>
+</body>
+</html>
