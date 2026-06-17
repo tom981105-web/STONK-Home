@@ -70,6 +70,7 @@
     roomMsg.textContent = message || (code ? `${code} 방 코드가 설정되었습니다.` : "방 코드를 입력하세요.");
     refreshLinks();
     loadMarketPulse();
+    if (window.__bgEquipRefresh) window.__bgEquipRefresh();
   }
 
   function getRoomOrWarn() {
@@ -619,6 +620,7 @@
           return;
         }
         setAuthUi(user, false);
+        if (window.__bgEquipRefresh) window.__bgEquipRefresh();
         const isAdmin = await checkAdmin(user);
         setAuthUi(user, isAdmin);
         // 로그인 권한 확인과 Market Pulse 읽기는 분리합니다.
@@ -664,6 +666,7 @@
     if (room()) SC.setLastRoomCode(room());
     refreshLinks();
     schedulePulseWatch(false);
+    if (window.__bgEquipRefresh) window.__bgEquipRefresh();
   });
 
   navAuthBtn.addEventListener("click", openAuthModal);
@@ -704,7 +707,117 @@
     if (document.activeElement === $("passwordInput")) doAuth("login");
   });
 
+  // ===== 배경화면 착용(스킨) — Gacha 보유 → Home 착용 → Battle 적용 =====
+  // 저장 위치: rooms/{room}/players/{uid}/equippedBackground (보안 규칙상 본인 쓰기 가능)
+  // 이미지: Gacha 사이트의 backgrounds 폴더(같은 origin)에서 webp→jpg→png 순으로 시도
+  const BG_IMG_BASE = "https://tom981105-web.github.io/STONK-Gacha/backgrounds/";
+  const BG_ITEMS = [
+    { id: "sbg-candle-basic", name: "기본 캔들 차트", grade: "Common" },
+    { id: "sbg-line-blue", name: "블루 라인 차트", grade: "Common" },
+    { id: "sbg-bid-green", name: "초록 호가창", grade: "Common" },
+    { id: "sbg-bid-red", name: "빨강 호가창", grade: "Common" },
+    { id: "sbg-night-exchange", name: "야간 거래소", grade: "Common" },
+    { id: "sbg-mono-terminal", name: "흑백 터미널", grade: "Common" },
+    { id: "sbg-small-bull", name: "소형 양봉", grade: "Common" },
+    { id: "sbg-small-bear", name: "소형 음봉", grade: "Common" },
+    { id: "sbg-uptrend", name: "상승 추세선", grade: "Rare" },
+    { id: "sbg-wedge-down", name: "하락 쐐기", grade: "Rare" },
+    { id: "sbg-volume-burst", name: "거래량 폭발", grade: "Rare" },
+    { id: "sbg-neon-ticker", name: "네온 티커", grade: "Rare" },
+    { id: "sbg-golden-cross", name: "골든 크로스", grade: "Rare" },
+    { id: "sbg-dead-cross", name: "데드 크로스", grade: "Rare" },
+    { id: "sbg-charging-bull", name: "질주하는 황소", grade: "Epic" },
+    { id: "sbg-roaring-bear", name: "포효하는 곰", grade: "Epic" },
+    { id: "sbg-circuit-break", name: "서킷 직전", grade: "Epic" },
+    { id: "sbg-holo-room", name: "홀로그램 트레이딩룸", grade: "Epic" },
+    { id: "sbg-goldrush", name: "골드러시 불장", grade: "Legendary" },
+    { id: "sbg-black-monday", name: "블랙 먼데이", grade: "Legendary" },
+    { id: "sbg-wallstreet-night", name: "월스트리트 야경", grade: "Legendary" },
+    { id: "sbg-moon-rocket", name: "떡상 로켓 우주", grade: "Mythic" }
+  ];
+  const BG_BY_ID = Object.fromEntries(BG_ITEMS.map((i) => [i.id, i]));
+  const BG_GRADE_COLOR = { Common: "#c7ccd6", Rare: "#6ea8ff", Epic: "#a06bff", Legendary: "#e8c87a", Mythic: "#ff5fa2" };
+  const bgEquip = { inv: {}, equipped: null };
+
+  function bgTryImage(id, cb) {
+    const exts = ["webp", "jpg", "png"];
+    let i = 0;
+    const next = () => {
+      if (i >= exts.length) { cb(null); return; }
+      const url = BG_IMG_BASE + id + "." + exts[i++];
+      const img = new Image();
+      img.onload = () => cb(url);
+      img.onerror = next;
+      img.src = url;
+    };
+    next();
+  }
+
+  async function bgEquipRefresh() {
+    const grid = $("bgEquipGrid");
+    const msg = $("bgEquipMsg");
+    if (!grid) return;
+    if (!state.user) { grid.innerHTML = ""; if (msg) msg.textContent = "로그인하면 보유한 배경을 불러옵니다."; return; }
+    const code = room();
+    if (!code) { grid.innerHTML = ""; if (msg) msg.textContent = "방 코드를 입력하면 이 방에서 보유한 배경이 표시됩니다."; return; }
+    if (!state.db) { if (msg) msg.textContent = "Firebase 연결 대기 중..."; return; }
+    if (msg) msg.textContent = "보유 배경 불러오는 중...";
+    try {
+      const base = `rooms/${code}/players/${state.user.uid}`;
+      const [invSnap, eqSnap] = await Promise.all([
+        state.db.ref(base + "/gachaInventory").once("value"),
+        state.db.ref(base + "/equippedBackground").once("value"),
+      ]);
+      bgEquip.inv = invSnap.val() || {};
+      bgEquip.equipped = eqSnap.val() || null;
+      renderBgEquip();
+    } catch (e) {
+      if (msg) msg.textContent = "배경 불러오기 실패: " + ((e && e.message) || e);
+    }
+  }
+
+  function renderBgEquip() {
+    const grid = $("bgEquipGrid");
+    const msg = $("bgEquipMsg");
+    if (!grid) return;
+    const owned = BG_ITEMS.filter((it) => Number(bgEquip.inv[it.id] || 0) > 0);
+    const eq = bgEquip.equipped;
+    let html = `<button class="bg-tile bg-none ${!eq ? "active" : ""}" type="button" data-bg=""><div class="bg-thumb bg-thumb-none">기본</div><span class="bg-name">미착용 (기본 배경)</span></button>`;
+    html += owned.map((it) => {
+      const c = BG_GRADE_COLOR[it.grade] || "#c7ccd6";
+      return `<button class="bg-tile ${eq === it.id ? "active" : ""}" type="button" data-bg="${it.id}" style="--gc:${c}">
+        <div class="bg-thumb" data-bg-id="${it.id}"><span class="bg-grade">${it.grade}</span></div>
+        <span class="bg-name">${escapeHtml(it.name)}</span></button>`;
+    }).join("");
+    grid.innerHTML = html;
+    if (msg) msg.textContent = owned.length ? `보유 ${owned.length}종 · 타일을 누르면 착용/교체됩니다.` : "이 방에서 보유한 배경이 없습니다. Gacha에서 배경화면을 먼저 뽑아 주세요.";
+    grid.querySelectorAll(".bg-thumb[data-bg-id]").forEach((el) => {
+      bgTryImage(el.getAttribute("data-bg-id"), (url) => { if (url) el.style.backgroundImage = `url("${url}")`; });
+    });
+    grid.querySelectorAll(".bg-tile").forEach((btn) => btn.addEventListener("click", () => equipBg(btn.getAttribute("data-bg") || null)));
+  }
+
+  async function equipBg(id) {
+    if (!requireLogin()) return;
+    const code = room();
+    const msg = $("bgEquipMsg");
+    if (!code) { if (msg) msg.textContent = "방 코드를 먼저 입력하세요."; return; }
+    if (!state.db) return;
+    try {
+      await state.db.ref(`rooms/${code}/players/${state.user.uid}/equippedBackground`).set(id || null);
+      bgEquip.equipped = id || null;
+      renderBgEquip();
+      if (msg) msg.textContent = id ? `착용 완료: ${(BG_BY_ID[id] && BG_BY_ID[id].name) || id} · Battle 게임 화면에 적용됩니다.` : "미착용으로 변경했습니다. (기본 배경)";
+    } catch (e) {
+      if (msg) msg.textContent = "착용 실패: " + ((e && e.message) || e);
+    }
+  }
+
+  // 외부(룸/로그인 변경)에서 호출할 수 있게 노출
+  window.__bgEquipRefresh = bgEquipRefresh;
+
   startPulseInterval();
+  bgEquipRefresh();
 
   setAdminVisible(false);
   initRememberLogin();
