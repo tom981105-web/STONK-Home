@@ -103,6 +103,31 @@
     return name.length > 16 ? name.slice(0, 16) : name;
   }
 
+  // PHASE 3: 닉네임은 Home 이 중심. 저장된 값 우선, 없으면 이메일에서 파생.
+  function deriveNickname(user) {
+    try {
+      const stored = localStorage.getItem("stonk:lastNickname") || localStorage.getItem("mb_nickname");
+      if (stored) return stored;
+    } catch (e) {}
+    return hostNickname(user);
+  }
+
+  // PHASE 3: Home 중심 세션 플래그 저장(민감 토큰은 저장하지 않음 — Auth 세션은 Firebase 관리).
+  function markHomeSession(code) {
+    try {
+      const c = SC.normalizeRoomCode(code);
+      if (c) localStorage.setItem("stonk:lastRoomCode", c);
+      localStorage.setItem("stonk:homeSessionReady", "true");
+      localStorage.setItem("stonk:lastEntryAt", String(Date.now()));
+      if (state.user) {
+        localStorage.setItem("stonk:lastUid", state.user.uid);
+        const nick = deriveNickname(state.user);
+        localStorage.setItem("stonk:lastNickname", nick);
+        localStorage.setItem("mb_nickname", nick); // Battle 닉네임 브릿지
+      }
+    } catch (e) {}
+  }
+
   async function reserveUniqueRoomCode() {
     if (!state.db) throw new Error("Firebase DB가 준비되지 않았습니다.");
     for (let i = 0; i < 20; i += 1) {
@@ -188,6 +213,7 @@
     }
     const code = requireRoom ? getRoomOrWarn() : room();
     if (requireRoom && !code) return;
+    markHomeSession(code); // PHASE 3: Home 에서 입장 완료 → 세션 플래그 저장
     location.href = SC.buildSiteUrl(site, { room: code });
   }
 
@@ -233,6 +259,12 @@
       if (btnOpenCreatedAdmin) btnOpenCreatedAdmin.disabled = true;
       return;
     }
+
+    // PHASE 3: 로그인 시점에 닉네임/uid 를 공유 키에 저장(타 사이트 fallback 용)
+    try {
+      localStorage.setItem("stonk:lastUid", user.uid);
+      localStorage.setItem("stonk:lastNickname", deriveNickname(user));
+    } catch (e) {}
 
     const label = user.email || user.uid;
     if (userEmail) userEmail.textContent = label;
@@ -641,6 +673,7 @@
   $("btnLogin").addEventListener("click", () => doAuth("login"));
   $("btnSignup").addEventListener("click", () => doAuth("signup"));
   $("btnLogout").addEventListener("click", async () => {
+    try { localStorage.removeItem("stonk:homeSessionReady"); } catch (e) {}
     if (state.auth) await state.auth.signOut();
   });
   $("btnUseRecent").addEventListener("click", () => setRoom(recentRoom.textContent, `${recentRoom.textContent} 방 코드를 다시 불러왔습니다.`));
