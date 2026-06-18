@@ -43,7 +43,8 @@
   const PULSE_REFRESH_MS = 60000;
 
   function room() {
-    return SC.normalizeRoomCode(roomInput.value);
+    // 단일 방 운영: 방 코드 개념 제거 → 항상 고정 방(MAIN)
+    return "MAIN";
   }
 
   function openAuthModal() {

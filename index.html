@@ -89,8 +89,8 @@
       <aside class="card command-card" id="joinCard">
         <div class="card-head">
           <div>
-            <h2>방 입장 컨트롤</h2>
-            <p>방 코드 입력, 로그인 상태, 관리자 방 생성을 한 카드에서 처리합니다.</p>
+            <h2>입장</h2>
+            <p>로그인 후 원하는 사이트로 바로 입장하세요. (단일 시장 운영)</p>
           </div>
           <span id="authBadgeJoin" class="mini-badge muted">확인 중</span>
         </div>
@@ -103,28 +103,18 @@
 
 
 
-        <div id="adminCreateBox" class="admin-create-box admin-only" hidden>
-          <div class="admin-create-head">
-            <div>
-              <b>관리자 방 생성</b>
-              <span>Home에서 실제 Firebase 방을 생성합니다.</span>
-            </div>
-            <span class="mini-badge">ADMIN</span>
-          </div>
-          <label class="input-label" for="roomTitleInput">방 이름 선택</label>
-          <input id="roomTitleInput" class="normal-input" maxlength="24" placeholder="예: 점심시간 주식대전" autocomplete="off" spellcheck="false" />
-          <div class="admin-create-actions">
-            <button id="btnCreateRoom" class="btn primary" type="button">새 방 생성</button>
-            <button id="btnOpenCreatedAdmin" class="btn ghost" type="button" disabled>Admin에서 관리</button>
-          </div>
-          <p id="createRoomMsg" class="msg">생성된 방은 Battle · Board · Wiki에서 같은 방 코드로 연결됩니다.</p>
+        <!-- 단일 방 운영: 방 코드 입력/방 생성 제거. (시장 시작/리셋은 STONK Admin에서) -->
+        <!-- 아래 요소들은 스크립트 호환을 위해 남겨두되 화면에는 숨긴다. -->
+        <div id="adminCreateBox" class="admin-create-box" hidden>
+          <input id="roomTitleInput" type="hidden" />
+          <button id="btnCreateRoom" type="button" hidden></button>
+          <button id="btnOpenCreatedAdmin" type="button" hidden disabled></button>
+          <p id="createRoomMsg" class="msg" hidden></p>
         </div>
+        <input id="roomCodeInput" type="hidden" />
+        <p id="roomMsg" class="msg" hidden></p>
 
-        <label class="input-label" for="roomCodeInput">방 코드</label>
-        <div class="room-row single">
-          <input id="roomCodeInput" maxlength="12" placeholder="예: ABC123" autocomplete="off" spellcheck="false" />
-        </div>
-        <p id="roomMsg" class="msg">관리자에게 받은 방 코드를 입력하세요. 최근 방 코드가 있으면 자동으로 불러옵니다.</p>
+        <p class="msg" style="margin:4px 0 2px">로그인 후 아래에서 바로 입장하세요. (방 선택이 필요 없는 단일 시장입니다)</p>
 
         <div class="quick-grid">
           <button id="btnJoinBattle" class="quick-card battle" type="button">

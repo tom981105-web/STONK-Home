@@ -76,7 +76,8 @@
   }
 
   function getCurrentRoomCode() {
-    return getUrlRoomCode() || getLastRoomCode();
+    // 단일 방 운영: 방 코드 개념을 없애고 항상 고정 방(MAIN)을 사용한다.
+    return getUrlRoomCode() || getLastRoomCode() || "MAIN";
   }
 
   function baseUrl(site) {
