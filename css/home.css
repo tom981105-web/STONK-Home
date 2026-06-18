@@ -384,3 +384,81 @@ input:focus { border-color: var(--brand); background: #fff; }
 .bg-grade { font-size: 10px; font-weight: 800; color: #fff; background: rgba(0, 0, 0, 0.5); padding: 2px 8px; border-radius: 999px; }
 .bg-name { font-size: 12.5px; font-weight: 600; line-height: 1.3; }
 .bg-tile.bg-none .bg-name { color: #9aa0b0; }
+
+/* ============================================================
+   STONK 다크 테마 — Battle(STONK증권)과 동일한 결로 통일 (v1.19.0)
+   파일 끝에서 라이트 하드코딩 표면들을 다크로 덮어쓴다.
+   ============================================================ */
+:root {
+  --bg: #0e0e11;
+  --bg2: #16171c;
+  --card: #16171c;
+  --card2: rgba(22, 23, 28, .72);
+  --text: #eceef2;
+  --text2: #a4a9b4;
+  --muted: #6c707b;
+  --border: #2a2c34;
+  --border2: #23252c;
+  --up: #f0454f;
+  --down: #4c8df6;
+  --shadow: 0 2px 12px rgba(0,0,0,.45), 0 1px 2px rgba(0,0,0,.35);
+  --shadow-lg: 0 22px 60px rgba(0,0,0,.6);
+}
+body {
+  background:
+    radial-gradient(900px 520px at 10% -8%, rgba(91,108,255,.16), transparent 60%),
+    radial-gradient(820px 520px at 100% 0%, rgba(139,92,246,.14), transparent 55%),
+    linear-gradient(180deg, #0d0e13 0%, var(--bg) 60%, #0a0b0f 100%);
+  color: var(--text);
+}
+.bg-glow-a { background: rgba(91,108,255,.16); }
+.bg-glow-b { background: rgba(139,92,246,.14); }
+
+/* 헤더/카드/표면 */
+.home-header::before { background: rgba(20,21,27,.6); border: 1px solid rgba(255,255,255,.06); }
+.card { background: rgba(22,23,28,.82); border-color: rgba(255,255,255,.08); backdrop-filter: blur(16px) saturate(120%); }
+.glass { background: rgba(22,23,28,.62); }
+
+/* 상단 네비 버튼 */
+.top-nav a { color: var(--text2); }
+.top-nav a:hover { color: var(--text); }
+.nav-auth-btn { background: rgba(255,255,255,.05); border-color: rgba(255,255,255,.1); color: var(--text2); }
+.nav-auth-btn:hover { color: var(--brand2); background: rgba(139,92,246,.12); border-color: rgba(139,92,246,.4); }
+
+/* 히어로 */
+.hero-copy {
+  border-color: rgba(255,255,255,.08);
+  background:
+    linear-gradient(135deg, rgba(26,27,34,.92), rgba(18,19,24,.78)),
+    radial-gradient(620px 300px at 70% 30%, rgba(91,108,255,.20), transparent 58%);
+}
+.hero-copy::after { background: radial-gradient(circle, rgba(139,92,246,.22), transparent 68%); }
+.eyebrow { background: rgba(91,108,255,.16); color: #9fb0ff; }
+.hero-stats div { background: rgba(255,255,255,.04); border-color: rgba(255,255,255,.08); }
+
+/* 입력/버튼 */
+input { background: #1b1c22; border-color: rgba(255,255,255,.1); color: var(--text); }
+input:focus { background: #1f2028; border-color: var(--brand2); }
+.btn { background: rgba(255,255,255,.05); border-color: rgba(255,255,255,.12); color: var(--text); }
+.btn:hover { background: rgba(255,255,255,.09); }
+.btn.ghost { background: rgba(255,255,255,.04); color: var(--text2); }
+.mini-badge.muted { color: var(--muted); background: rgba(255,255,255,.06); }
+.icon-btn { background: rgba(255,255,255,.05); border-color: rgba(255,255,255,.1); color: var(--text2); }
+.icon-btn:hover { background: rgba(255,255,255,.1); color: var(--text); }
+
+/* 입장 카드 내부 */
+.login-hint { background: rgba(91,108,255,.1); border-color: rgba(91,108,255,.22); }
+.quick-card { background: linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02)); border-color: rgba(255,255,255,.08); }
+.quick-card:hover { box-shadow: 0 12px 28px rgba(0,0,0,.45); border-color: rgba(139,92,246,.4); }
+.quick-card.gacha span { background: rgba(232,200,122,.16); color: #e8c87a; }
+.quick-card.admin span { background: rgba(255,255,255,.08); color: #aeb6c4; }
+.recent-box { background: rgba(255,255,255,.04); }
+
+/* 티커/사이트/플로우/모달 */
+.ticker-head { background: linear-gradient(180deg, rgba(91,108,255,.12), rgba(255,255,255,.02)); }
+.ticker-line span { background: rgba(255,255,255,.05); border-color: rgba(255,255,255,.08); color: var(--text2); }
+.flow-item { background: rgba(255,255,255,.04); border-color: rgba(255,255,255,.08); }
+.locked { background: linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02)); }
+.auth-dim { background: rgba(4,5,9,.66); }
+.auth-user { background: rgba(255,255,255,.04); border-color: rgba(255,255,255,.08); }
+.pulse-refresh { background: rgba(255,255,255,.06); }
