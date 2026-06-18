@@ -682,6 +682,16 @@
   });
   $("btnUseRecent").addEventListener("click", () => setRoom(recentRoom.textContent, `${recentRoom.textContent} 방 코드를 다시 불러왔습니다.`));
   $("btnGoBattle").addEventListener("click", () => go("battle", false, false));
+  // 라이트/다크 테마 토글 (Battle 과 같은 localStorage 키 공유)
+  const themeBtn = $("themeToggle");
+  const syncThemeIcon = () => { if (themeBtn) themeBtn.textContent = document.documentElement.getAttribute("data-theme") === "dark" ? "☀️" : "🌙"; };
+  syncThemeIcon();
+  if (themeBtn) themeBtn.addEventListener("click", () => {
+    const next = document.documentElement.getAttribute("data-theme") === "dark" ? "light" : "dark";
+    document.documentElement.setAttribute("data-theme", next);
+    try { localStorage.setItem("stonk:theme", next); } catch (e) {}
+    syncThemeIcon();
+  });
   const btnScrollJoin = $("btnScrollJoin");
   if (btnScrollJoin) btnScrollJoin.addEventListener("click", () => $("joinCard").scrollIntoView({ behavior: "smooth", block: "center" }));
   $("btnJoinBattle").addEventListener("click", () => go("battle", true, false));

@@ -7,7 +7,11 @@
   <title>STONK Home | 가상 주식 투자 대전</title>
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
-  <link rel="stylesheet" href="css/home.css?v=1.19.0" />
+  <link rel="stylesheet" href="css/home.css?v=1.20.0" />
+  <script>
+    // 깜빡임 방지: 저장된 테마(없으면 dark)를 페인트 전에 적용. Battle 과 동일 키 공유.
+    try { document.documentElement.setAttribute("data-theme", localStorage.getItem("stonk:theme") || "dark"); } catch (e) { document.documentElement.setAttribute("data-theme", "dark"); }
+  </script>
 </head>
 <body>
   <div class="bg-glow bg-glow-a"></div>
@@ -24,6 +28,7 @@
       <a id="topGacha" href="#">Gacha</a>
       <a id="topBoard" href="#">Board</a>
       <a id="topWiki" href="#">Wiki</a>
+      <button id="themeToggle" class="theme-toggle" type="button" title="라이트/다크 전환" aria-label="테마 전환">🌙</button>
       <button id="btnAuthOpen" class="nav-auth-btn" type="button">로그인</button>
       <a id="topAdmin" href="#" class="admin-link admin-only" hidden>Admin</a>
     </nav>
