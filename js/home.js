@@ -876,8 +876,10 @@
     try {
       if (m.type === "cash") {
         await state.db.ref("rooms/MAIN/bank/" + uid + "/balance").transaction((b) => (Number(b) || 0) + Number(m.amount || 0));
+      } else if (m.type === "skin" && m.itemId) {
+        await state.db.ref("rooms/MAIN/players/" + uid + "/gachaInventory/" + m.itemId).transaction((v) => (Number(v) || 0) + 1);
       }
-      // 쿠폰/스킨 연동은 2단계(Gacha). 지금은 수령 표시 처리.
+      // 쿠폰(가챠 무료뽑기 등)은 Gacha 연동 예정 — 지금은 수령 표시만.
       await state.db.ref("rooms/MAIN/mail/" + uid + "/" + id + "/claimed").set(true);
       if (msg) msg.textContent = `'${mailLabel(m)}' 수령 완료!`;
       bankRefresh();
