@@ -408,8 +408,8 @@ input:focus { border-color: var(--brand); background: #fff; }
 [data-theme="dark"] .home-header::before { background: rgba(20,21,27,.6); border: 1px solid rgba(255,255,255,.06); }
 [data-theme="dark"] .card { background: rgba(22,23,28,.82); border-color: rgba(255,255,255,.08); backdrop-filter: blur(16px) saturate(120%); }
 [data-theme="dark"] .glass { background: rgba(22,23,28,.62); }
-[data-theme="dark"] .top-nav a { color: var(--text2); }
-[data-theme="dark"] .top-nav a:hover { color: var(--text); }
+[data-theme="dark"] .top-nav a { color: var(--text); background: rgba(255,255,255,.06); border-color: rgba(255,255,255,.12); }
+[data-theme="dark"] .top-nav a:hover { color: #fff; background: rgba(139,92,246,.18); border-color: rgba(139,92,246,.45); }
 [data-theme="dark"] .nav-auth-btn { background: rgba(255,255,255,.05); border-color: rgba(255,255,255,.1); color: var(--text2); }
 [data-theme="dark"] .nav-auth-btn:hover { color: var(--brand2); background: rgba(139,92,246,.12); border-color: rgba(139,92,246,.4); }
 [data-theme="dark"] .hero-copy {
