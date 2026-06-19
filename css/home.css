@@ -432,8 +432,13 @@ input:focus { border-color: var(--brand); background: #fff; }
 [data-theme="dark"] .login-hint { background: rgba(91,108,255,.1); border-color: rgba(91,108,255,.22); }
 [data-theme="dark"] .quick-card { background: linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02)); border-color: rgba(255,255,255,.08); }
 [data-theme="dark"] .quick-card:hover { box-shadow: 0 12px 28px rgba(0,0,0,.45); border-color: rgba(139,92,246,.4); }
-[data-theme="dark"] .quick-card.gacha span { background: rgba(232,200,122,.16); color: #e8c87a; }
-[data-theme="dark"] .quick-card.admin span { background: rgba(255,255,255,.08); color: #aeb6c4; }
+/* 퀵카드 배지: 다크에서 대비 확보 (보라/인디고가 어두워 안 보이던 문제) */
+[data-theme="dark"] .quick-card span { color: #9fb0ff; background: rgba(91,108,255,.20); }
+[data-theme="dark"] .quick-card.arcade span,
+[data-theme="dark"] .quick-card.wiki span { color: #bda8ff; background: rgba(139,92,246,.22); }
+[data-theme="dark"] .quick-card.board span { color: #7aa9ff; background: rgba(76,141,246,.20); }
+[data-theme="dark"] .quick-card.gacha span { color: #f0d488; background: rgba(232,200,122,.20); }
+[data-theme="dark"] .quick-card.admin span { color: #c8cfdb; background: rgba(255,255,255,.12); }
 [data-theme="dark"] .recent-box { background: rgba(255,255,255,.04); }
 [data-theme="dark"] .ticker-head { background: linear-gradient(180deg, rgba(91,108,255,.12), rgba(255,255,255,.02)); }
 [data-theme="dark"] .ticker-line span { background: rgba(255,255,255,.05); border-color: rgba(255,255,255,.08); color: var(--text2); }
