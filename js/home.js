@@ -622,6 +622,7 @@
         }
         setAuthUi(user, false);
         if (window.__bgEquipRefresh) window.__bgEquipRefresh();
+        if (window.__bankRefresh) window.__bankRefresh();
         const isAdmin = await checkAdmin(user);
         setAuthUi(user, isAdmin);
         // 로그인 권한 확인과 Market Pulse 읽기는 분리합니다.
@@ -826,11 +827,100 @@
     }
   }
 
+  // ===== STONK 금고(영구 계좌) + 우편함 =====
+  const bank = { balance: 0, mail: [] };
+  function deriveNick() { return state.nickname || (state.user && (state.user.displayName || (state.user.email || "").split("@")[0])) || "플레이어"; }
+  async function bankRefresh() {
+    const balEl = $("bankBalance"), mailEl = $("mailList"), cnt = $("mailCount");
+    if (!state.user || !state.db) {
+      if (balEl) balEl.textContent = "로그인 필요";
+      if (mailEl) mailEl.innerHTML = `<div class="mail-empty">로그인하면 금고와 우편함이 표시됩니다.</div>`;
+      if (cnt) cnt.textContent = "0";
+      return;
+    }
+    try {
+      const uid = state.user.uid;
+      // 친구 송금 검색용으로 닉네임을 계좌에 기록
+      state.db.ref("accounts/" + uid).update({ nickname: deriveNick(), updatedAt: Date.now() }).catch(() => {});
+      const [accSnap, mailSnap] = await Promise.all([
+        state.db.ref("accounts/" + uid + "/balance").once("value"),
+        state.db.ref("mail/" + uid).once("value"),
+      ]);
+      bank.balance = Number(accSnap.val() || 0);
+      const mv = mailSnap.val() || {};
+      bank.mail = Object.entries(mv).map(([id, m]) => ({ id, ...m })).filter((m) => !m.claimed).sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+      renderBank();
+    } catch (e) {
+      const msg = $("bankMsg"); if (msg) msg.textContent = "금고 불러오기 실패: " + ((e && e.message) || e);
+    }
+  }
+  function mailLabel(m) {
+    if (m.type === "cash") return `💰 ${Number(m.amount || 0).toLocaleString("ko-KR")}원`;
+    if (m.type === "coupon") return `🎟 쿠폰 ${escapeHtml(m.coupon || "")}`;
+    if (m.type === "skin") return `🎨 스킨 ${escapeHtml(m.itemId || "")}`;
+    return "📦 선물";
+  }
+  function renderBank() {
+    const balEl = $("bankBalance"), mailEl = $("mailList"), cnt = $("mailCount");
+    if (balEl) balEl.textContent = bank.balance.toLocaleString("ko-KR") + "원";
+    if (cnt) cnt.textContent = String(bank.mail.length);
+    if (!mailEl) return;
+    mailEl.innerHTML = bank.mail.length
+      ? bank.mail.map((m) => `<div class="mail-row"><div class="mail-info"><b>${mailLabel(m)}</b><span>${escapeHtml(m.from || "STONK")}${m.msg ? " · " + escapeHtml(m.msg) : ""}</span></div><button class="btn tiny" type="button" data-claim="${m.id}">받기</button></div>`).join("")
+      : `<div class="mail-empty">받은 우편이 없습니다.</div>`;
+  }
+  async function claimMail(id) {
+    const m = bank.mail.find((x) => x.id === id);
+    if (!m || !state.user || !state.db) return;
+    const uid = state.user.uid, msg = $("bankMsg");
+    try {
+      if (m.type === "cash") {
+        await state.db.ref("accounts/" + uid + "/balance").transaction((b) => (Number(b) || 0) + Number(m.amount || 0));
+      }
+      // 쿠폰/스킨 연동은 2단계(Gacha). 지금은 수령 표시 처리.
+      await state.db.ref("mail/" + uid + "/" + id + "/claimed").set(true);
+      if (msg) msg.textContent = `'${mailLabel(m)}' 수령 완료!`;
+      bankRefresh();
+    } catch (e) {
+      if (msg) msg.textContent = "수령 실패: " + ((e && e.message) || e);
+    }
+  }
+  async function sendMoney() {
+    if (!requireLogin()) return;
+    if (!state.db) return;
+    const msg = $("bankMsg");
+    const toName = (prompt("받는 사람의 닉네임을 입력하세요") || "").trim();
+    if (!toName) return;
+    const amt = Math.floor(Number(prompt("보낼 금액(원)") || 0));
+    if (!amt || amt < 1) { if (msg) msg.textContent = "금액을 확인하세요."; return; }
+    try {
+      const accSnap = await state.db.ref("accounts").once("value");
+      const accs = accSnap.val() || {};
+      const matches = Object.entries(accs).filter(([uid, a]) => uid !== state.user.uid && String((a && a.nickname) || "").trim() === toName);
+      if (!matches.length) { if (msg) msg.textContent = `'${toName}' 계좌를 찾을 수 없습니다. (상대가 Home 금고를 한 번 열어야 검색됩니다)`; return; }
+      const ruid = matches[0][0];
+      const res = await state.db.ref("accounts/" + state.user.uid + "/balance").transaction((b) => { b = Number(b) || 0; if (b < amt) return; return b - amt; });
+      if (!res.committed) { if (msg) msg.textContent = "금고 잔액이 부족합니다."; return; }
+      const mid = state.db.ref("mail/" + ruid).push().key;
+      await state.db.ref("mail/" + ruid + "/" + mid).set({ type: "cash", amount: amt, from: deriveNick(), msg: "송금", createdAt: Date.now(), claimed: false });
+      if (msg) msg.textContent = `${toName} 님에게 ${amt.toLocaleString("ko-KR")}원을 보냈습니다.`;
+      bankRefresh();
+    } catch (e) {
+      if (msg) msg.textContent = "송금 실패: " + ((e && e.message) || e);
+    }
+  }
+  $("btnSendMoney") && $("btnSendMoney").addEventListener("click", sendMoney);
+  $("btnBankRefresh") && $("btnBankRefresh").addEventListener("click", bankRefresh);
+  const mailListEl = $("mailList");
+  if (mailListEl) mailListEl.addEventListener("click", (e) => { const b = e.target.closest("[data-claim]"); if (b) claimMail(b.getAttribute("data-claim")); });
+  window.__bankRefresh = bankRefresh;
+
   // 외부(룸/로그인 변경)에서 호출할 수 있게 노출
   window.__bgEquipRefresh = bgEquipRefresh;
 
   startPulseInterval();
   bgEquipRefresh();
+  bankRefresh();
 
   setAdminVisible(false);
   initRememberLogin();

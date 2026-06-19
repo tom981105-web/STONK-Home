@@ -480,3 +480,19 @@ input:focus { border-color: var(--brand); background: #fff; }
   font-size: 10.5px; font-weight: 900; padding: 3px 9px; border-radius: 999px;
   background: var(--gc, #e8c87a); color: #0a0a12; box-shadow: 0 3px 10px rgba(0,0,0,.45);
 }
+
+/* ===== STONK 금고(영구 계좌) + 우편함 ===== */
+.bank-bal { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; padding: 14px 16px; border-radius: 16px; background: rgba(91,108,255,.08); border: 1px solid rgba(91,108,255,.18); margin: 4px 0 12px; }
+.bank-bal span { font-size: 13px; font-weight: 800; color: var(--text2); }
+.bank-bal b { font-size: 26px; font-weight: 900; font-variant-numeric: tabular-nums; }
+.bank-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+.bank-actions .btn { min-width: 150px; }
+.bank-sub { margin: 16px 0 8px; font-size: 15px; display: flex; align-items: center; gap: 8px; }
+.mail-list { display: flex; flex-direction: column; gap: 8px; }
+.mail-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 11px 13px; border-radius: 13px; background: rgba(255,255,255,.04); border: 1px solid var(--border); }
+.mail-info { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.mail-info b { font-size: 14px; font-weight: 800; }
+.mail-info span { font-size: 12px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.mail-empty { padding: 18px; text-align: center; color: var(--muted); font-size: 13px; }
+[data-theme="dark"] .bank-bal { background: rgba(91,108,255,.12); border-color: rgba(91,108,255,.28); }
+[data-theme="dark"] .mail-row { background: rgba(255,255,255,.04); }
