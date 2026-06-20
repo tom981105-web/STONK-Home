@@ -520,3 +520,15 @@ input:focus { border-color: var(--brand); background: #fff; }
 /* 알림(결과) 팝업: 단일 버튼 + 줄바꿈 허용 */
 .stonk-modal-actions.one { grid-template-columns: 1fr; }
 .stonk-modal-desc { white-space: pre-line; }
+
+/* v2.0: 은행 자산 요약 카드 */
+.bank-summary-card .bs-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 6px 0 14px; }
+.bank-summary-card .bs-cell { display: flex; flex-direction: column; gap: 3px; padding: 11px 13px;
+  background: rgba(255,255,255,.03); border: 1px solid var(--line, #2a3242); border-radius: 12px; }
+.bank-summary-card .bs-cell span { font-size: 12px; color: var(--muted, #8b97a8); font-weight: 600; }
+.bank-summary-card .bs-cell b { font-size: 16px; font-weight: 800; font-variant-numeric: tabular-nums; }
+.bank-summary-card .bs-cell.wide { grid-column: 1 / -1; }
+.bank-summary-card .bs-cell.net { background: linear-gradient(135deg, rgba(232,200,122,.10), rgba(91,140,255,.06)); }
+.bank-summary-card .bs-cell.net b { font-size: 20px; }
+.bank-summary-card .bs-cell b.warn { color: #f2566a; }
+.bank-summary-card #btnGoBank { width: 100%; }

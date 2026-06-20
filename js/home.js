@@ -702,6 +702,8 @@
   if (btnJoinGacha) btnJoinGacha.addEventListener("click", () => go("gacha", true, false));
   const btnJoinBank = $("btnJoinBank");
   if (btnJoinBank) btnJoinBank.addEventListener("click", () => go("bank", true, false));
+  const btnGoBank = $("btnGoBank");
+  if (btnGoBank) btnGoBank.addEventListener("click", () => go("bank", true, false));
   $("btnJoinBoard").addEventListener("click", () => go("board", true, false));
   $("btnJoinWiki").addEventListener("click", () => go("wiki", true, false));
   $("btnJoinAdmin").addEventListener("click", () => go("admin", true, true));
@@ -914,9 +916,37 @@
       const mv = mailSnap.val() || {};
       bank.mail = Object.entries(mv).map(([id, m]) => ({ id, ...m })).filter((m) => !m.claimed).sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
       renderBank();
+      // v2.0: 은행 자산 요약(요약 조회만 — Home 에서는 이자/수익 정산하지 않음)
+      try {
+        const [bankSnap, cashSnap] = await Promise.all([
+          state.db.ref("rooms/MAIN/bank/" + uid).once("value"),
+          state.db.ref("rooms/MAIN/players/" + uid + "/cash").once("value"),
+        ]);
+        renderBankSummary(bankSnap.val() || {}, Number(cashSnap.val() || 0));
+      } catch (_) {}
     } catch (e) {
       const msg = $("bankMsg"); if (msg) msg.textContent = "금고 불러오기 실패: " + ((e && e.message) || e);
     }
+  }
+  function bankGrade(s) { s = Math.max(0, Math.min(100, Math.round(isFinite(s) ? s : 60))); return s >= 90 ? "S" : s >= 75 ? "A" : s >= 55 ? "B" : s >= 35 ? "C" : s >= 15 ? "D" : "F"; }
+  function wonK(n) { return Number(n || 0).toLocaleString("ko-KR") + "원"; }
+  function renderBankSummary(b, cash) {
+    const used = !!(b && (b.balance != null || b.createdAt != null));
+    const free = Number(b.balance || 0);
+    const fixedSum = Object.values(b.fixed || {}).reduce((a, f) => a + Number((f && f.amount) || 0), 0);
+    const vip = Number(b.vipVaultBalance || 0);
+    const invVal = Object.values(b.investments || {}).reduce((a, v) => a + Number((v && v.principal) || 0), 0);
+    const loanP = Number(b.loanPrincipal || 0), loanI = Number(b.loanInterest || 0);
+    const net = cash + free + fixedSum + vip + invVal - loanP - loanI;
+    const set = (id, v) => { const el = $(id); if (el) el.textContent = v; };
+    set("bsGrade", used ? ("신용 " + bankGrade(b.creditScore)) : "미이용");
+    set("bsCash", wonK(cash));
+    set("bsFree", used ? wonK(free) : "은행 이용 전");
+    set("bsFixed", used ? wonK(fixedSum) : "—");
+    set("bsLoan", used ? wonK(loanP + loanI) : "—");
+    set("bsNet", wonK(net));
+    const loanEl = $("bsLoan"); if (loanEl) loanEl.classList.toggle("warn", (loanP + loanI) > 0);
+    const netEl = $("bsNet"); if (netEl) netEl.classList.toggle("warn", net < 0);
   }
   function mailLabel(m) {
     if (m.type === "cash") return `💰 ${Number(m.amount || 0).toLocaleString("ko-KR")}원`;
