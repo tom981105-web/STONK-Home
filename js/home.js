@@ -178,7 +178,7 @@
         createdAt: ts,
         players: { [user.uid]: player },
         settings: {
-          initialCash: 10000000,
+          initialCash: 5000000,
           tickMs: 4000,
           maxPlayers: 6,
           source: "STONK Home",
