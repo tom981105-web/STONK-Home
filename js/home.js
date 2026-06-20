@@ -863,6 +863,28 @@
     });
   }
 
+  // 결과/완료 알림 팝업 (확인 버튼 1개)
+  function stonkAlert({ title, desc, icon, confirm = "확인" }) {
+    return new Promise((resolve) => {
+      const ov = document.createElement("div");
+      ov.className = "stonk-modal";
+      ov.innerHTML = `
+        <div class="stonk-modal-dim"></div>
+        <div class="stonk-modal-card card" role="dialog" aria-modal="true">
+          <div class="stonk-modal-head">${icon ? `<span class="stonk-modal-icon">${icon}</span>` : ""}<h3>${escapeHtml(title || "")}</h3></div>
+          ${desc ? `<p class="stonk-modal-desc">${escapeHtml(desc)}</p>` : ""}
+          <div class="stonk-modal-actions one"><button class="btn primary" type="button" data-ok>${escapeHtml(confirm)}</button></div>
+        </div>`;
+      document.body.appendChild(ov);
+      document.body.classList.add("modal-open");
+      const done = () => { ov.remove(); document.body.classList.remove("modal-open"); resolve(); };
+      ov.querySelector("[data-ok]").addEventListener("click", done);
+      ov.querySelector(".stonk-modal-dim").addEventListener("click", done);
+      ov.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === "Escape") done(); });
+      setTimeout(() => { const b = ov.querySelector("[data-ok]"); b && b.focus(); }, 30);
+    });
+  }
+
   // ===== STONK 금고(영구 계좌) + 우편함 =====
   const bank = { balance: 0, mail: [] };
   let bankBalRef = null; // 잔액 상시 리스너(트랜잭션이 캐시를 잡도록 — 송금 '잔액 부족' 버그 방지)
@@ -931,6 +953,7 @@
     if (!requireLogin()) return;
     if (!state.db) return;
     const msg = $("bankMsg");
+    if (msg) msg.textContent = ""; // 옛 텍스트 결과 제거 (이제 결과는 팝업으로)
     const vals = await openStonkModal({
       title: "친구에게 보내기",
       desc: `금고에서 친구 금고로 보냅니다. 보유 ${bank.balance.toLocaleString("ko-KR")}원`,
@@ -944,8 +967,8 @@
     if (!vals) return;
     const toName = String(vals.to || "").trim();
     const amt = Math.floor(Number(vals.amt) || 0);
-    if (!toName) { if (msg) msg.textContent = "닉네임을 입력하세요."; return; }
-    if (!amt || amt < 1) { if (msg) msg.textContent = "금액을 확인하세요."; return; }
+    if (!toName) { await stonkAlert({ title: "보내기 실패", desc: "받는 사람 닉네임을 입력하세요.", icon: "⚠️" }); return; }
+    if (!amt || amt < 1) { await stonkAlert({ title: "보내기 실패", desc: "보낼 금액을 확인하세요.", icon: "⚠️" }); return; }
     try {
       // 닉네임 → uid: 플레이어 명단(닉네임 설정 위치)과 금고 양쪽에서 찾는다
       const [pSnap, bSnap] = await Promise.all([
@@ -956,15 +979,18 @@
       const collect = (obj) => { Object.entries(obj || {}).forEach(([uid, v]) => { const n = String((v && v.nickname) || "").trim(); if (n && !nickMap[n]) nickMap[n] = uid; }); };
       collect(pSnap.val()); collect(bSnap.val());
       const ruid = nickMap[toName];
-      if (!ruid || ruid === state.user.uid) { if (msg) msg.textContent = ruid ? "자기 자신에게는 보낼 수 없습니다." : `'${toName}' 닉네임을 찾을 수 없습니다. (상대가 한 번 이상 접속해 닉네임을 설정해야 합니다)`; return; }
+      if (!ruid || ruid === state.user.uid) {
+        await stonkAlert({ title: "보내기 실패", icon: "⚠️", desc: ruid ? "자기 자신에게는 보낼 수 없습니다." : `'${toName}' 닉네임을 찾을 수 없습니다. (상대가 한 번 이상 접속해 닉네임을 설정해야 합니다)` });
+        return;
+      }
       const res = await state.db.ref("rooms/MAIN/bank/" + state.user.uid + "/balance").transaction((b) => { b = Number(b) || 0; if (b < amt) return; return b - amt; });
-      if (!res.committed) { if (msg) msg.textContent = "금고 잔액이 부족합니다."; return; }
+      if (!res.committed) { await stonkAlert({ title: "보내기 실패", desc: "금고 잔액이 부족합니다.", icon: "⚠️" }); return; }
       const mid = state.db.ref("rooms/MAIN/mail/" + ruid).push().key;
       await state.db.ref("rooms/MAIN/mail/" + ruid + "/" + mid).set({ type: "cash", amount: amt, from: deriveNick(), msg: "송금", createdAt: Date.now(), claimed: false });
-      if (msg) msg.textContent = `${toName} 님에게 ${amt.toLocaleString("ko-KR")}원을 보냈습니다.`;
       bankRefresh();
+      await stonkAlert({ title: "송금 완료 🎉", icon: "✅", desc: `${toName} 님에게 ${amt.toLocaleString("ko-KR")}원을 보냈습니다.\n상대가 우편함에서 받으면 금고에 들어갑니다.` });
     } catch (e) {
-      if (msg) msg.textContent = "송금 실패: " + ((e && e.message) || e);
+      await stonkAlert({ title: "송금 실패", desc: "오류: " + ((e && e.message) || e), icon: "⚠️" });
     }
   }
   $("btnSendMoney") && $("btnSendMoney").addEventListener("click", sendMoney);
