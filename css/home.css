@@ -496,3 +496,23 @@ input:focus { border-color: var(--brand); background: #fff; }
 .mail-empty { padding: 18px; text-align: center; color: var(--muted); font-size: 13px; }
 [data-theme="dark"] .bank-bal { background: rgba(91,108,255,.12); border-color: rgba(91,108,255,.28); }
 [data-theme="dark"] .mail-row { background: rgba(255,255,255,.04); }
+
+/* ===== 공용 입력 모달 (prompt 대체) ===== */
+.stonk-modal { position: fixed; inset: 0; z-index: 200; display: grid; place-items: center; padding: 20px; animation: fadeIn .16s ease; }
+.stonk-modal-dim { position: absolute; inset: 0; background: rgba(8,10,18,.55); backdrop-filter: blur(6px); }
+[data-theme="dark"] .stonk-modal-dim { background: rgba(4,5,9,.66); }
+.stonk-modal-card { position: relative; width: min(420px, 100%); padding: 22px; border-radius: 22px; box-shadow: var(--shadow-lg); animation: popIn .18s ease-out; }
+.stonk-modal-head { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
+.stonk-modal-icon { font-size: 24px; }
+.stonk-modal-head h3 { font-size: 21px; letter-spacing: -.03em; font-weight: 900; }
+.stonk-modal-desc { color: var(--text2); font-size: 13.5px; line-height: 1.55; margin-bottom: 12px; }
+.stonk-modal-fields { display: flex; flex-direction: column; gap: 4px; }
+.stonk-modal-label { font-size: 12.5px; font-weight: 800; color: var(--text2); margin: 8px 2px 4px; }
+.stonk-modal-inwrap { position: relative; display: flex; align-items: center; }
+.stonk-modal-input { width: 100%; min-height: 48px; padding: 12px 14px; border: 1.5px solid var(--border); border-radius: var(--radius-sm); background: var(--card); color: var(--text); font-size: 16px; font-weight: 800; letter-spacing: normal; text-transform: none; font-variant-numeric: tabular-nums; }
+[data-theme="dark"] .stonk-modal-input { background: #1b1c22; border-color: rgba(255,255,255,.12); }
+.stonk-modal-input:focus { border-color: var(--brand); }
+.stonk-modal-suffix { position: absolute; right: 14px; font-size: 13px; font-weight: 800; color: var(--muted); pointer-events: none; }
+.stonk-modal-actions { display: grid; grid-template-columns: 1fr 1.3fr; gap: 8px; margin-top: 18px; }
+@keyframes popIn { from { opacity: 0; transform: translateY(-8px) scale(.98); } to { opacity: 1; transform: none; } }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }

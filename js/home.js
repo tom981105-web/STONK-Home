@@ -827,6 +827,42 @@
     }
   }
 
+  // 공용 모달 (브라우저 prompt 대체 — Home UI 톤) → 입력값 객체 or null(취소) 반환
+  function openStonkModal({ title, desc, icon, fields = [], confirm = "확인" }) {
+    return new Promise((resolve) => {
+      const ov = document.createElement("div");
+      ov.className = "stonk-modal";
+      ov.innerHTML = `
+        <div class="stonk-modal-dim"></div>
+        <div class="stonk-modal-card card" role="dialog" aria-modal="true">
+          <div class="stonk-modal-head">${icon ? `<span class="stonk-modal-icon">${icon}</span>` : ""}<h3>${escapeHtml(title || "")}</h3></div>
+          ${desc ? `<p class="stonk-modal-desc">${escapeHtml(desc)}</p>` : ""}
+          <div class="stonk-modal-fields">
+            ${fields.map((f, i) => `
+              <label class="stonk-modal-label" for="sm-f${i}">${escapeHtml(f.label || "")}</label>
+              <div class="stonk-modal-inwrap">
+                <input id="sm-f${i}" class="stonk-modal-input" data-fi="${i}" type="${f.type || "text"}" inputmode="${f.type === "number" ? "numeric" : "text"}" placeholder="${escapeHtml(f.placeholder || "")}" value="${escapeHtml(f.value != null ? String(f.value) : "")}" autocomplete="off" />
+                ${f.suffix ? `<span class="stonk-modal-suffix">${escapeHtml(f.suffix)}</span>` : ""}
+              </div>`).join("")}
+          </div>
+          <div class="stonk-modal-actions">
+            <button class="btn ghost" type="button" data-cancel>취소</button>
+            <button class="btn primary" type="button" data-ok>${escapeHtml(confirm)}</button>
+          </div>
+        </div>`;
+      document.body.appendChild(ov);
+      document.body.classList.add("modal-open");
+      const inputs = Array.from(ov.querySelectorAll(".stonk-modal-input"));
+      setTimeout(() => { inputs[0] && inputs[0].focus(); inputs[0] && inputs[0].select && inputs[0].select(); }, 30);
+      const done = (v) => { ov.remove(); document.body.classList.remove("modal-open"); resolve(v); };
+      const submit = () => { const out = {}; fields.forEach((f, i) => { out[f.key || i] = inputs[i] ? inputs[i].value : ""; }); done(out); };
+      ov.querySelector("[data-cancel]").addEventListener("click", () => done(null));
+      ov.querySelector(".stonk-modal-dim").addEventListener("click", () => done(null));
+      ov.querySelector("[data-ok]").addEventListener("click", submit);
+      ov.addEventListener("keydown", (e) => { if (e.key === "Enter") { e.preventDefault(); submit(); } else if (e.key === "Escape") done(null); });
+    });
+  }
+
   // ===== STONK 금고(영구 계좌) + 우편함 =====
   const bank = { balance: 0, mail: [] };
   let bankBalRef = null; // 잔액 상시 리스너(트랜잭션이 캐시를 잡도록 — 송금 '잔액 부족' 버그 방지)
@@ -895,9 +931,20 @@
     if (!requireLogin()) return;
     if (!state.db) return;
     const msg = $("bankMsg");
-    const toName = (prompt("받는 사람의 닉네임을 입력하세요") || "").trim();
-    if (!toName) return;
-    const amt = Math.floor(Number(prompt("보낼 금액(원)") || 0));
+    const vals = await openStonkModal({
+      title: "친구에게 보내기",
+      desc: `금고에서 친구 금고로 보냅니다. 보유 ${bank.balance.toLocaleString("ko-KR")}원`,
+      icon: "💸",
+      fields: [
+        { key: "to", label: "받는 사람 닉네임", placeholder: "닉네임 입력", type: "text" },
+        { key: "amt", label: "보낼 금액 (원)", placeholder: "0", type: "number", suffix: "원" },
+      ],
+      confirm: "보내기",
+    });
+    if (!vals) return;
+    const toName = String(vals.to || "").trim();
+    const amt = Math.floor(Number(vals.amt) || 0);
+    if (!toName) { if (msg) msg.textContent = "닉네임을 입력하세요."; return; }
     if (!amt || amt < 1) { if (msg) msg.textContent = "금액을 확인하세요."; return; }
     try {
       // 닉네임 → uid: 플레이어 명단(닉네임 설정 위치)과 금고 양쪽에서 찾는다
