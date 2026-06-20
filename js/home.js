@@ -222,8 +222,8 @@
   function refreshLinks() {
     const code = room();
     const map = {
-      topBattle: "battle", topArcade: "arcade", topGacha: "gacha", topBoard: "board", topWiki: "wiki", topAdmin: "admin",
-      siteBattle: "battle", siteArcade: "arcade", siteGacha: "gacha", siteBoard: "board", siteWiki: "wiki", siteAdmin: "admin",
+      topBattle: "battle", topArcade: "arcade", topGacha: "gacha", topBank: "bank", topBoard: "board", topWiki: "wiki", topAdmin: "admin",
+      siteBattle: "battle", siteArcade: "arcade", siteGacha: "gacha", siteBank: "bank", siteBoard: "board", siteWiki: "wiki", siteAdmin: "admin",
     };
     Object.entries(map).forEach(([id, site]) => {
       const el = $(id);
@@ -700,6 +700,8 @@
   if (btnJoinArcade) btnJoinArcade.addEventListener("click", () => go("arcade", true, false));
   const btnJoinGacha = $("btnJoinGacha");
   if (btnJoinGacha) btnJoinGacha.addEventListener("click", () => go("gacha", true, false));
+  const btnJoinBank = $("btnJoinBank");
+  if (btnJoinBank) btnJoinBank.addEventListener("click", () => go("bank", true, false));
   $("btnJoinBoard").addEventListener("click", () => go("board", true, false));
   $("btnJoinWiki").addEventListener("click", () => go("wiki", true, false));
   $("btnJoinAdmin").addEventListener("click", () => go("admin", true, true));
