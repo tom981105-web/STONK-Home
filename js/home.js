@@ -829,6 +829,7 @@
 
   // ===== STONK 금고(영구 계좌) + 우편함 =====
   const bank = { balance: 0, mail: [] };
+  let bankBalRef = null; // 잔액 상시 리스너(트랜잭션이 캐시를 잡도록 — 송금 '잔액 부족' 버그 방지)
   function deriveNick() { return state.nickname || (state.user && (state.user.displayName || (state.user.email || "").split("@")[0])) || "플레이어"; }
   async function bankRefresh() {
     const balEl = $("bankBalance"), mailEl = $("mailList"), cnt = $("mailCount");
@@ -842,11 +843,14 @@
       const uid = state.user.uid;
       // 친구 송금 검색용으로 닉네임을 계좌에 기록
       state.db.ref("rooms/MAIN/bank/" + uid).update({ nickname: deriveNick(), updatedAt: Date.now() }).catch(() => {});
-      const [accSnap, mailSnap] = await Promise.all([
-        state.db.ref("rooms/MAIN/bank/" + uid + "/balance").once("value"),
-        state.db.ref("rooms/MAIN/mail/" + uid).once("value"),
-      ]);
-      bank.balance = Number(accSnap.val() || 0);
+      // 잔액은 상시 구독(.on) → 노드가 캐시되어 트랜잭션이 정상 동작하고 실시간 갱신됨
+      const newRef = state.db.ref("rooms/MAIN/bank/" + uid + "/balance");
+      if (!bankBalRef || bankBalRef.toString() !== newRef.toString()) {
+        if (bankBalRef) bankBalRef.off();
+        bankBalRef = newRef;
+        bankBalRef.on("value", (snap) => { bank.balance = Number(snap.val() || 0); renderBank(); });
+      }
+      const mailSnap = await state.db.ref("rooms/MAIN/mail/" + uid).once("value");
       const mv = mailSnap.val() || {};
       bank.mail = Object.entries(mv).map(([id, m]) => ({ id, ...m })).filter((m) => !m.claimed).sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
       renderBank();
