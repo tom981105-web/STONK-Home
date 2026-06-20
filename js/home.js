@@ -896,11 +896,16 @@
     const amt = Math.floor(Number(prompt("보낼 금액(원)") || 0));
     if (!amt || amt < 1) { if (msg) msg.textContent = "금액을 확인하세요."; return; }
     try {
-      const accSnap = await state.db.ref("rooms/MAIN/bank").once("value");
-      const accs = accSnap.val() || {};
-      const matches = Object.entries(accs).filter(([uid, a]) => uid !== state.user.uid && String((a && a.nickname) || "").trim() === toName);
-      if (!matches.length) { if (msg) msg.textContent = `'${toName}' 계좌를 찾을 수 없습니다. (상대가 Home 금고를 한 번 열어야 검색됩니다)`; return; }
-      const ruid = matches[0][0];
+      // 닉네임 → uid: 플레이어 명단(닉네임 설정 위치)과 금고 양쪽에서 찾는다
+      const [pSnap, bSnap] = await Promise.all([
+        state.db.ref("rooms/MAIN/players").once("value"),
+        state.db.ref("rooms/MAIN/bank").once("value"),
+      ]);
+      const nickMap = {};
+      const collect = (obj) => { Object.entries(obj || {}).forEach(([uid, v]) => { const n = String((v && v.nickname) || "").trim(); if (n && !nickMap[n]) nickMap[n] = uid; }); };
+      collect(pSnap.val()); collect(bSnap.val());
+      const ruid = nickMap[toName];
+      if (!ruid || ruid === state.user.uid) { if (msg) msg.textContent = ruid ? "자기 자신에게는 보낼 수 없습니다." : `'${toName}' 닉네임을 찾을 수 없습니다. (상대가 한 번 이상 접속해 닉네임을 설정해야 합니다)`; return; }
       const res = await state.db.ref("rooms/MAIN/bank/" + state.user.uid + "/balance").transaction((b) => { b = Number(b) || 0; if (b < amt) return; return b - amt; });
       if (!res.committed) { if (msg) msg.textContent = "금고 잔액이 부족합니다."; return; }
       const mid = state.db.ref("rooms/MAIN/mail/" + ruid).push().key;
