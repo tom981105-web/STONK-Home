@@ -7,7 +7,7 @@
   <title>STONK Home | 가상 주식 투자 대전</title>
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
-  <link rel="stylesheet" href="css/home.css?v=1.28.0" />
+  <link rel="stylesheet" href="css/home.css?v=1.29.0" />
   <script>
     // 깜빡임 방지: 저장된 테마(없으면 dark)를 페인트 전에 적용. Battle 과 동일 키 공유.
     try { document.documentElement.setAttribute("data-theme", localStorage.getItem("stonk:theme") || "dark"); } catch (e) { document.documentElement.setAttribute("data-theme", "dark"); }
@@ -170,24 +170,6 @@
     </section>
 
     <section class="site-section">
-      <div class="card bank-card">
-        <div class="card-head">
-          <div>
-            <h2>STONK 금고</h2>
-            <p>시장을 초기화해도 사라지지 않는 영구 계좌입니다. Battle에서 <b>채우기(넣기)</b>로 옮겨 두고, 친구에게 닉네임으로 보내거나 받은 우편을 수령하세요.</p>
-          </div>
-          <span class="mini-badge" id="bankBadge">BANK</span>
-        </div>
-        <div class="bank-bal"><span>금고 잔액</span><b id="bankBalance">로그인 필요</b></div>
-        <div class="bank-actions">
-          <button id="btnSendMoney" class="btn primary" type="button">친구에게 보내기</button>
-          <button id="btnBankRefresh" class="btn ghost small" type="button">새로고침</button>
-        </div>
-        <p id="bankMsg" class="msg"></p>
-        <h3 class="bank-sub">📬 우편함 <span id="mailCount" class="mini-badge muted">0</span></h3>
-        <div id="mailList" class="mail-list"></div>
-      </div>
-
       <div class="card bank-summary-card">
         <div class="card-head">
           <div>
@@ -202,6 +184,12 @@
           <div class="bs-cell"><span>정기예금</span><b id="bsFixed">—</b></div>
           <div class="bs-cell"><span>대출 잔액</span><b id="bsLoan">—</b></div>
           <div class="bs-cell wide net"><span>순자산</span><b id="bsNet">—</b></div>
+        </div>
+        <div class="bs-chips" id="bsChips">
+          <span class="bs-chip" id="bsVip">VIP —</span>
+          <span class="bs-chip" id="bsIns">보험 0건</span>
+          <span class="bs-chip" id="bsInv">투자 0건</span>
+          <span class="bs-chip" id="bsUnread" hidden>알림 0</span>
         </div>
         <button id="btnGoBank" class="btn primary" type="button">은행 관리하기</button>
       </div>
@@ -278,6 +266,6 @@
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
   <script src="js/site-config.js?v=1.19.0"></script>
-  <script src="js/home.js?v=1.27.0"></script>
+  <script src="js/home.js?v=1.28.0"></script>
 </body>
 </html>

@@ -532,3 +532,11 @@ input:focus { border-color: var(--brand); background: #fff; }
 .bank-summary-card .bs-cell.net b { font-size: 20px; }
 .bank-summary-card .bs-cell b.warn { color: #f2566a; }
 .bank-summary-card #btnGoBank { width: 100%; }
+
+/* v2.5: 은행 요약 추가 칩 */
+.bank-summary-card .bs-chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 4px 0 12px; }
+.bank-summary-card .bs-chip { font-size: 12px; font-weight: 700; padding: 5px 11px; border-radius: 999px;
+  background: rgba(255,255,255,.04); border: 1px solid var(--line, #2a3242); color: var(--text2, #a6acbb); }
+.bank-summary-card .bs-chip.warn { color: #f2566a; border-color: rgba(242,86,106,.4); }
+.bank-summary-card .bs-chip.black { color: #f0d488; background: #14151c; border-color: #3a2f12; }
+.mini-badge.black { color: #f0d488; background: #14151c; border-color: #3a2f12; }

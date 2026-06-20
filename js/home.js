@@ -947,6 +947,24 @@
     set("bsNet", wonK(net));
     const loanEl = $("bsLoan"); if (loanEl) loanEl.classList.toggle("warn", (loanP + loanI) > 0);
     const netEl = $("bsNet"); if (netEl) netEl.classList.toggle("warn", net < 0);
+
+    // v2.5: 보험/투자/VIP/알림 요약(개수만 계산 — Home 은 정산하지 않음)
+    const now = Date.now();
+    const activeIns = Object.values(b.insurances || {}).filter((i) => i && i.status === "active" && Number(i.expiresAt || 0) > now).length;
+    const invs = Object.values(b.investments || {});
+    const invActive = invs.filter((v) => v && v.status !== "settled").length;
+    const invMatured = invs.filter((v) => v && v.status !== "settled" && now >= Number(v.maturesAt || 0)).length;
+    const unread = Object.values(b.messages || {}).filter((m) => m && !m.read).length;
+    const tier = used ? (b.vipTier || "NORMAL") : "NORMAL";
+    const tierLabel = { NORMAL: "일반", SILVER: "실버", GOLD: "골드", PLATINUM: "플래티넘", BLACK: "블랙" }[tier] || "일반";
+    const vipEl = $("bsVip");
+    if (vipEl) { vipEl.textContent = "VIP " + tierLabel; vipEl.classList.toggle("black", tier === "BLACK"); }
+    set("bsIns", `보험 ${activeIns}건`);
+    set("bsInv", invMatured > 0 ? `투자 ${invActive}건 · 정산 ${invMatured}` : `투자 ${invActive}건`);
+    const unreadEl = $("bsUnread");
+    if (unreadEl) { unreadEl.hidden = unread <= 0; unreadEl.textContent = `알림 ${unread}`; unreadEl.classList.toggle("warn", unread > 0); }
+    // 등급 배지에 BLACK 강조
+    const gEl = $("bsGrade"); if (gEl) gEl.classList.toggle("black", tier === "BLACK");
   }
   function mailLabel(m) {
     if (m.type === "cash") return `💰 ${Number(m.amount || 0).toLocaleString("ko-KR")}원`;
