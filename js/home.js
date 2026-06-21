@@ -974,11 +974,14 @@
       if (card.enabled) {
         const owed = Math.max(Number(card.billingAmount || 0), Number(card.usedAmount || 0));
         const due = Number(card.dueAt || 0);
+        const remain = Math.max(0, Number(card.cardLimit || 0) - Number(card.usedAmount || 0));
         let txt = `카드 ${card.cardTier || ""}`;
         if (card.suspended) txt += " · 정지";
         else if (card.overdue) txt += " · 미납";
         else if (owed > 0) txt += " · 청구 " + wonK(owed);
+        else txt += " · 잔여 " + wonK(remain);
         if (due > 0 && !card.suspended) { const left = Math.max(0, due - Date.now()); txt += left > 0 ? ` · D-${Math.ceil(left / 3600000)}h` : " · 결제일"; }
+        if (card.autoPayEnabled) txt += " · 자동납부ON";
         cardEl.hidden = false; cardEl.textContent = txt;
         cardEl.classList.toggle("warn", !!(card.overdue || card.suspended));
       } else { cardEl.hidden = true; }
