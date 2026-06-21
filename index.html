@@ -7,7 +7,7 @@
   <title>STONK Home | 가상 주식 투자 대전</title>
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
-  <link rel="stylesheet" href="css/home.css?v=1.31.0" />
+  <link rel="stylesheet" href="css/home.css?v=1.32.0" />
   <script>
     // 깜빡임 방지: 저장된 테마(없으면 dark)를 페인트 전에 적용. Battle 과 동일 키 공유.
     try { document.documentElement.setAttribute("data-theme", localStorage.getItem("stonk:theme") || "dark"); } catch (e) { document.documentElement.setAttribute("data-theme", "dark"); }
@@ -29,6 +29,7 @@
       <a id="topArcade" href="#">아케이드</a>
       <a id="topGacha" href="#">가챠</a>
       <a id="topBank" href="#">은행</a>
+      <a id="topCompany" href="#">회사</a>
       <a id="topAdmin" href="#" class="admin-link admin-only" hidden>관리자</a>
       <button id="themeToggle" class="theme-toggle" type="button" title="라이트/다크 전환" aria-label="테마 전환">🌙</button>
       <button id="btnAuthOpen" class="nav-auth-btn" type="button">로그인</button>
@@ -136,6 +137,9 @@
           <button id="btnJoinBank" class="quick-card bank" type="button">
             <span>Bank</span><b>STONK 은행 입장</b><small>예금 · 대출 · 신용등급 · 자산관리</small>
           </button>
+          <button id="btnJoinCompany" class="quick-card company" type="button">
+            <span>Company</span><b>STONK 타이쿤 경영</b><small>회사 설립 · 성장 · IPO 상장 준비</small>
+          </button>
           <button id="btnJoinBoard" class="quick-card board" type="button">
             <span>Board</span><b>시장 소식 보기</b><small>속보 · 공시 · 업종 분위기</small>
           </button>
@@ -190,6 +194,8 @@
           <span class="bs-chip" id="bsIns">보험 0건</span>
           <span class="bs-chip" id="bsInv">투자 0건</span>
           <span class="bs-chip" id="bsCard" hidden>카드 —</span>
+          <span class="bs-chip" id="bsCompany">회사 미설립</span>
+          <span class="bs-chip" id="bsBiz" hidden>사업대출 0</span>
           <span class="bs-chip" id="bsUnread" hidden>알림 0</span>
         </div>
         <div class="bs-event" id="bsEvent" hidden></div>
@@ -267,7 +273,7 @@
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
-  <script src="js/site-config.js?v=1.19.0"></script>
-  <script src="js/home.js?v=1.30.0"></script>
+  <script src="js/site-config.js?v=1.20.0"></script>
+  <script src="js/home.js?v=1.31.0"></script>
 </body>
 </html>

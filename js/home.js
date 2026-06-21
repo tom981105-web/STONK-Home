@@ -222,7 +222,7 @@
   function refreshLinks() {
     const code = room();
     const map = {
-      topBattle: "battle", topArcade: "arcade", topGacha: "gacha", topBank: "bank", topBoard: "board", topWiki: "wiki", topAdmin: "admin",
+      topBattle: "battle", topArcade: "arcade", topGacha: "gacha", topBank: "bank", topCompany: "company", topBoard: "board", topWiki: "wiki", topAdmin: "admin",
       siteBattle: "battle", siteArcade: "arcade", siteGacha: "gacha", siteBank: "bank", siteBoard: "board", siteWiki: "wiki", siteAdmin: "admin",
     };
     Object.entries(map).forEach(([id, site]) => {
@@ -704,6 +704,8 @@
   if (btnJoinBank) btnJoinBank.addEventListener("click", () => go("bank", true, false));
   const btnGoBank = $("btnGoBank");
   if (btnGoBank) btnGoBank.addEventListener("click", () => go("bank", true, false));
+  const btnJoinCompany = $("btnJoinCompany");
+  if (btnJoinCompany) btnJoinCompany.addEventListener("click", () => go("company", true, false));
   $("btnJoinBoard").addEventListener("click", () => go("board", true, false));
   $("btnJoinWiki").addEventListener("click", () => go("wiki", true, false));
   $("btnJoinAdmin").addEventListener("click", () => go("admin", true, true));
@@ -918,12 +920,13 @@
       renderBank();
       // v2.0: 은행 자산 요약(요약 조회만 — Home 에서는 이자/수익 정산하지 않음)
       try {
-        const [bankSnap, cashSnap, evSnap] = await Promise.all([
+        const [bankSnap, cashSnap, evSnap, coSnap] = await Promise.all([
           state.db.ref("rooms/MAIN/bank/" + uid).once("value"),
           state.db.ref("rooms/MAIN/players/" + uid + "/cash").once("value"),
           state.db.ref("rooms/MAIN/bankEvents/current").once("value"),
+          state.db.ref("rooms/MAIN/companies/" + uid).once("value"),
         ]);
-        renderBankSummary(bankSnap.val() || {}, Number(cashSnap.val() || 0), evSnap.val());
+        renderBankSummary(bankSnap.val() || {}, Number(cashSnap.val() || 0), evSnap.val(), coSnap.val());
       } catch (_) {}
     } catch (e) {
       const msg = $("bankMsg"); if (msg) msg.textContent = "금고 불러오기 실패: " + ((e && e.message) || e);
@@ -931,7 +934,7 @@
   }
   function bankGrade(s) { s = Math.max(0, Math.min(100, Math.round(isFinite(s) ? s : 60))); return s >= 90 ? "S" : s >= 75 ? "A" : s >= 55 ? "B" : s >= 35 ? "C" : s >= 15 ? "D" : "F"; }
   function wonK(n) { return Number(n || 0).toLocaleString("ko-KR") + "원"; }
-  function renderBankSummary(b, cash, evRaw) {
+  function renderBankSummary(b, cash, evRaw, co) {
     const used = !!(b && (b.balance != null || b.createdAt != null));
     const free = Number(b.balance || 0);
     const fixedSum = Object.values(b.fixed || {}).reduce((a, f) => a + Number((f && f.amount) || 0), 0);
@@ -986,6 +989,19 @@
         cardEl.classList.toggle("warn", !!(card.overdue || card.suspended));
       } else { cardEl.hidden = true; }
     }
+
+    // v3.0: Company 요약 칩
+    const coEl = $("bsCompany");
+    if (coEl) {
+      if (co && co.name) {
+        const STG = { STARTUP: "스타트업", SMALL_BIZ: "소기업", SCALE_UP: "성장기업", ENTERPRISE: "대기업", PRE_IPO: "상장 준비", LISTED: "상장기업" };
+        coEl.textContent = `회사 ${co.name} · ${STG[co.stage] || ""} · IPO ${Math.round(Number(co.ipoReadiness || 0))}%`;
+        coEl.classList.remove("warn");
+      } else { coEl.textContent = "회사 미설립"; }
+    }
+    const bizEl = $("bsBiz");
+    const owed = (b.businessLoan ? Number(b.businessLoan.principal || 0) + Number(b.businessLoan.interest || 0) : 0);
+    if (bizEl) { bizEl.hidden = owed <= 0; bizEl.textContent = "사업대출 " + wonK(owed); bizEl.classList.add("warn"); }
 
     // v2.9: 오늘의 금융 이벤트
     const evEl = $("bsEvent");

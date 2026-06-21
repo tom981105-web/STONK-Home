@@ -545,3 +545,8 @@ input:focus { border-color: var(--brand); background: #fff; }
 .bank-summary-card .bs-event { margin: 2px 0 12px; padding: 9px 12px; border-radius: 10px; font-size: 12.5px; font-weight: 600;
   background: linear-gradient(135deg, rgba(91,140,255,.10), rgba(54,211,153,.05)); border: 1px solid rgba(91,140,255,.3); }
 .bank-summary-card .bs-event b { font-weight: 800; }
+
+/* v3.0: Company 퀵카드 */
+.quick-card.company span { color: #36d399; }
+.quick-card.company { border-color: rgba(54,211,153,.3); }
+.bank-summary-card .bs-chip { } /* (기존) */
