@@ -540,3 +540,8 @@ input:focus { border-color: var(--brand); background: #fff; }
 .bank-summary-card .bs-chip.warn { color: #f2566a; border-color: rgba(242,86,106,.4); }
 .bank-summary-card .bs-chip.black { color: #f0d488; background: #14151c; border-color: #3a2f12; }
 .mini-badge.black { color: #f0d488; background: #14151c; border-color: #3a2f12; }
+
+/* v2.9: 카드 칩 + 이벤트 */
+.bank-summary-card .bs-event { margin: 2px 0 12px; padding: 9px 12px; border-radius: 10px; font-size: 12.5px; font-weight: 600;
+  background: linear-gradient(135deg, rgba(91,140,255,.10), rgba(54,211,153,.05)); border: 1px solid rgba(91,140,255,.3); }
+.bank-summary-card .bs-event b { font-weight: 800; }

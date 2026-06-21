@@ -918,11 +918,12 @@
       renderBank();
       // v2.0: 은행 자산 요약(요약 조회만 — Home 에서는 이자/수익 정산하지 않음)
       try {
-        const [bankSnap, cashSnap] = await Promise.all([
+        const [bankSnap, cashSnap, evSnap] = await Promise.all([
           state.db.ref("rooms/MAIN/bank/" + uid).once("value"),
           state.db.ref("rooms/MAIN/players/" + uid + "/cash").once("value"),
+          state.db.ref("rooms/MAIN/bankEvents/current").once("value"),
         ]);
-        renderBankSummary(bankSnap.val() || {}, Number(cashSnap.val() || 0));
+        renderBankSummary(bankSnap.val() || {}, Number(cashSnap.val() || 0), evSnap.val());
       } catch (_) {}
     } catch (e) {
       const msg = $("bankMsg"); if (msg) msg.textContent = "금고 불러오기 실패: " + ((e && e.message) || e);
@@ -930,7 +931,7 @@
   }
   function bankGrade(s) { s = Math.max(0, Math.min(100, Math.round(isFinite(s) ? s : 60))); return s >= 90 ? "S" : s >= 75 ? "A" : s >= 55 ? "B" : s >= 35 ? "C" : s >= 15 ? "D" : "F"; }
   function wonK(n) { return Number(n || 0).toLocaleString("ko-KR") + "원"; }
-  function renderBankSummary(b, cash) {
+  function renderBankSummary(b, cash, evRaw) {
     const used = !!(b && (b.balance != null || b.createdAt != null));
     const free = Number(b.balance || 0);
     const fixedSum = Object.values(b.fixed || {}).reduce((a, f) => a + Number((f && f.amount) || 0), 0);
@@ -965,6 +966,47 @@
     if (unreadEl) { unreadEl.hidden = unread <= 0; unreadEl.textContent = `알림 ${unread}`; unreadEl.classList.toggle("warn", unread > 0); }
     // 등급 배지에 BLACK 강조
     const gEl = $("bsGrade"); if (gEl) gEl.classList.toggle("black", tier === "BLACK");
+
+    // v2.9: 카드 요약 칩
+    const card = (b && b.card) || {};
+    const cardEl = $("bsCard");
+    if (cardEl) {
+      if (card.enabled) {
+        const owed = Math.max(Number(card.billingAmount || 0), Number(card.usedAmount || 0));
+        const due = Number(card.dueAt || 0);
+        let txt = `카드 ${card.cardTier || ""}`;
+        if (card.suspended) txt += " · 정지";
+        else if (card.overdue) txt += " · 미납";
+        else if (owed > 0) txt += " · 청구 " + wonK(owed);
+        if (due > 0 && !card.suspended) { const left = Math.max(0, due - Date.now()); txt += left > 0 ? ` · D-${Math.ceil(left / 3600000)}h` : " · 결제일"; }
+        cardEl.hidden = false; cardEl.textContent = txt;
+        cardEl.classList.toggle("warn", !!(card.overdue || card.suspended));
+      } else { cardEl.hidden = true; }
+    }
+
+    // v2.9: 오늘의 금융 이벤트
+    const evEl = $("bsEvent");
+    if (evEl) {
+      const ev = resolveHomeEvent(evRaw);
+      if (ev) { evEl.hidden = false; evEl.innerHTML = `📰 <b>오늘의 금융 이벤트</b> · ${escapeHtml(ev.title)} <span class="muted">(게임머니)</span>`; }
+      else evEl.hidden = true;
+    }
+  }
+  // Home은 표시만: manual(미만료) 우선, 없으면 날짜 seed 로 간단 계산
+  var HOME_EVENTS = [
+    { type: "lowrate", title: "저금리 데이" }, { type: "highrate", title: "고금리 데이" },
+    { type: "boom", title: "투자 호황" }, { type: "bust", title: "투자 침체" },
+    { type: "insurance", title: "보험 우대 기간" }, { type: "cashback", title: "카드 캐시백 이벤트" },
+    { type: "vipweek", title: "VIP 우대 기간" }, { type: "caution", title: "금융 경계주의보" },
+  ];
+  function resolveHomeEvent(raw) {
+    const now = Date.now();
+    if (raw && raw.manual && (!raw.expiresAt || Number(raw.expiresAt) > now) && raw.title) return raw;
+    const d = new Date(now + 9 * 3600000);
+    const key = "bankevt:" + d.getUTCFullYear() + "-" + (d.getUTCMonth() + 1) + "-" + d.getUTCDate();
+    let h = 2166136261 >>> 0;
+    for (let i = 0; i < key.length; i++) { h ^= key.charCodeAt(i); h = Math.imul(h, 16777619); }
+    return HOME_EVENTS[(h >>> 0) % HOME_EVENTS.length];
   }
   function mailLabel(m) {
     if (m.type === "cash") return `💰 ${Number(m.amount || 0).toLocaleString("ko-KR")}원`;
